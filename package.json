@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "prepare": "node scripts/copy-leaflet.js",
+    "build": "node scripts/copy-leaflet.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "dev:cf": "wrangler pages dev ./public --compatibility-date=2024-09-23",
