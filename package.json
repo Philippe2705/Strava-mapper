@@ -1,0 +1,24 @@
+{
+  "name": "strava-mapper",
+  "version": "1.0.0",
+  "description": "Visualize all your Strava activities on an interactive map",
+  "main": "server.js",
+  "scripts": {
+    "prepare": "node scripts/copy-leaflet.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "dev:cf": "wrangler pages dev ./public --compatibility-date=2024-09-23",
+    "deploy": "wrangler pages deploy ./public"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "wrangler": "^3.0.0"
+  }
+}

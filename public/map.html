@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strava Mapper — My Activities</title>
+
+  <!-- Leaflet CSS (served locally) -->
+  <link rel="stylesheet" href="/leaflet/leaflet.css" />
+
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="map-body">
+
+  <!-- Top navigation bar -->
+  <header class="map-navbar">
+    <div class="navbar-brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="currentColor"/>
+        <circle cx="12" cy="9" r="2.5" fill="white"/>
+      </svg>
+      Strava Mapper
+    </div>
+
+    <div class="navbar-athlete" id="athlete-info">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="navbar-actions">
+      <button id="btn-fit-bounds" class="btn-secondary" title="Fit all routes in view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+        Fit all
+      </button>
+      <a href="/logout" class="btn-secondary">Logout</a>
+    </div>
+  </header>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <p id="loading-text">Fetching your activities…</p>
+      <div class="progress-bar-wrap">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+      <p id="loading-count" class="loading-count">0 activities loaded</p>
+    </div>
+  </div>
+
+  <!-- Main layout: map + sidebar -->
+  <div class="map-layout">
+
+    <!-- Leaflet map -->
+    <div id="map"></div>
+
+    <!-- Legend (floating, inside map area) -->
+    <div id="legend" class="legend hidden">
+      <div class="legend-header">
+        <span>Activity types</span>
+        <button id="legend-toggle-all" class="legend-toggle-all">Hide all</button>
+      </div>
+      <ul id="legend-list" class="legend-list">
+        <!-- Populated by JS -->
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Stats panel -->
+  <section id="stats-panel" class="stats-panel hidden">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-count">—</div>
+        <div class="stat-label">Activities</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-distance">—</div>
+        <div class="stat-label">Total distance</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-elevation">—</div>
+        <div class="stat-label">Total elevation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-time">—</div>
+        <div class="stat-label">Moving time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-longest">—</div>
+        <div class="stat-label">Longest activity</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-highest">—</div>
+        <div class="stat-label">Most elevation gain</div>
+      </div>
+    </div>
+
+    <div class="type-breakdown" id="type-breakdown">
+      <!-- Populated by JS -->
+    </div>
+
+  </section>
+
+  <!-- Leaflet JS (served locally) -->
+  <script src="/leaflet/leaflet.js"></script>
+
+  <script src="/js/map.js"></script>
+</body>
+</html>

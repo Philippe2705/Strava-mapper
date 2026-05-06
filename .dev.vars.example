@@ -1,0 +1,9 @@
+# Copy this file to .dev.vars for local development with:
+#   npm run dev:cf   (wrangler pages dev)
+#
+# These are equivalent to the Cloudflare Pages secrets set in the dashboard.
+# .dev.vars is gitignored — never commit real credentials.
+
+STRAVA_CLIENT_ID=your_client_id_here
+STRAVA_CLIENT_SECRET=your_client_secret_here
+SESSION_SECRET=replace-with-a-long-random-string

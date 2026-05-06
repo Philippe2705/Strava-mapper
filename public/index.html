@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strava Mapper — Setup</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="setup-body">
+
+  <header class="navbar">
+    <div class="navbar-brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="currentColor"/>
+        <circle cx="12" cy="9" r="2.5" fill="white"/>
+      </svg>
+      Strava Mapper
+    </div>
+  </header>
+
+  <main class="setup-main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Visualize every activity<br/>on one map</h1>
+      <p class="hero-sub">Connect your Strava account and see all your runs, rides, hikes and more plotted on an interactive map with full stats.</p>
+    </section>
+
+    <!-- Error banner -->
+    <div id="error-banner" class="error-banner hidden"></div>
+
+    <!-- State: not configured -->
+    <section id="section-setup" class="card hidden">
+      <h2 class="card-title">
+        <span class="step-badge">Setup required</span>
+        Create your Strava API Application
+      </h2>
+      <p class="card-desc">Before connecting, you need to register a free API application on Strava. This gives the app permission to read your activities. It takes about 2 minutes.</p>
+
+      <ol class="steps-list">
+        <li>
+          <strong>Open Strava API settings</strong>
+          <p>Go to <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> (log in if prompted).</p>
+        </li>
+        <li>
+          <strong>Create a new application</strong>
+          <p>Fill in the form with these values:</p>
+          <table class="settings-table">
+            <tr><td>Application Name</td><td><code>Strava Mapper</code> (or anything you like)</td></tr>
+            <tr><td>Category</td><td><code>Data Importer</code></td></tr>
+            <tr><td>Club</td><td><em>leave empty</em></td></tr>
+            <tr><td>Website</td><td><code>http://localhost</code></td></tr>
+            <tr><td>Authorization Callback Domain</td><td><code>localhost</code></td></tr>
+          </table>
+          <p>Accept the API agreement and click <strong>Create</strong>.</p>
+        </li>
+        <li>
+          <strong>Copy your credentials</strong>
+          <p>After creating the app, you will see your <strong>Client ID</strong> (a number) and <strong>Client Secret</strong> (a long hex string).</p>
+        </li>
+        <li>
+          <strong>Create a <code>.env</code> file</strong>
+          <p>In the project folder, copy <code>.env.example</code> to <code>.env</code> and fill in your credentials:</p>
+          <pre class="code-block">STRAVA_CLIENT_ID=<span class="placeholder">123456</span>
+STRAVA_CLIENT_SECRET=<span class="placeholder">abcdef1234567890abcdef1234567890abcdef12</span>
+SESSION_SECRET=<span class="placeholder">any-long-random-string</span>
+PORT=3000</pre>
+        </li>
+        <li>
+          <strong>Restart the server</strong>
+          <p>Stop the server (<kbd>Ctrl+C</kbd>) and run <code>npm start</code> again. Then refresh this page.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- State: configured, ready to connect -->
+    <section id="section-connect" class="card hidden">
+      <h2 class="card-title">Ready to connect</h2>
+      <p class="card-desc">Your Strava API credentials are configured. Click the button below to authorize this app to read your activities.</p>
+      <a href="/auth/strava" class="btn-strava">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+        </svg>
+        Connect with Strava
+      </a>
+      <p class="privacy-note">This app only requests read access to your activities. No data is written to your account.</p>
+    </section>
+
+  </main>
+
+  <footer class="setup-footer">
+    <p>Strava Mapper is an open-source local tool. Your data never leaves your machine.</p>
+  </footer>
+
+  <script src="/js/setup.js"></script>
+</body>
+</html>
