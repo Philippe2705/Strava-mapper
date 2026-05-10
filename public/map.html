@@ -110,15 +110,7 @@
         <!-- ── Tab: Stats ────────────────────────────────────────────────── -->
         <div class="tab-panel" id="tab-stats">
 
-          <div class="sidebar-section-title">Totals</div>
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value" id="stat-count">—</div><div class="stat-label">Activities</div></div>
-            <div class="stat-card"><div class="stat-value" id="stat-distance">—</div><div class="stat-label">Distance</div></div>
-            <div class="stat-card"><div class="stat-value" id="stat-elevation">—</div><div class="stat-label">Elevation</div></div>
-            <div class="stat-card"><div class="stat-value" id="stat-time">—</div><div class="stat-label">Moving time</div></div>
-          </div>
-
-          <div class="sidebar-section-title" style="margin-top:16px;">By type</div>
+          <div class="sidebar-section-title">By type</div>
           <div id="type-breakdown" class="type-breakdown"></div>
 
         </div>
@@ -140,6 +132,16 @@
           <div class="sidebar-section-title" style="margin-top:20px;">Activity calendar</div>
           <div id="calendar-wrap" class="calendar-wrap"></div>
 
+        </div>
+
+        <!-- ── Persistent stats footer (always visible) ─────────────────── -->
+        <div class="sidebar-stats-footer">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="stat-count">—</div><div class="stat-label">Activities</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-distance">—</div><div class="stat-label">Distance</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-elevation">—</div><div class="stat-label">Elevation</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-time">—</div><div class="stat-label">Moving time</div></div>
+          </div>
         </div>
 
       </aside>

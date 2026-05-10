@@ -219,6 +219,12 @@ button { font-family: inherit; cursor: pointer; }
 .legend-count { font-size: 0.72rem; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 1px 7px; }
 
 /* ── Stats ───────────────────────────────────────────────────────────────────── */
+.sidebar-stats-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--sidebar-border);
+  padding: 10px 12px;
+  background: var(--sidebar-bg);
+}
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .stat-card { background: var(--stat-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
 .stat-value { font-size: 1.15rem; font-weight: 800; color: var(--orange); letter-spacing: -0.4px; line-height: 1.2; }

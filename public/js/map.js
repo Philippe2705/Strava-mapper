@@ -171,7 +171,7 @@ function buildHeatmap() {
 
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
   if (points.length) {
-    heatLayer = L.heatLayer(points, { radius: 10, blur: 8, maxZoom: 17, gradient: { 0.2: '#1677ff', 0.5: '#FC4C02', 1: '#fff' } });
+    heatLayer = L.heatLayer(points, { radius: 18, blur: 12, maxZoom: 17, minOpacity: 0.5, gradient: { 0.0: '#000080', 0.25: '#0000ff', 0.5: '#FC4C02', 0.75: '#ffaa00', 1.0: '#ffffff' } });
     heatLayer.addTo(map);
   }
 }
@@ -269,7 +269,7 @@ function buildRecords() {
   const src = allActivities;
   const records = [
     { medal: '���', title: 'Longest activity',        find: src.reduce((b, a) => (a.distance||0) > (b?.distance||0) ? a : b, null),         fmt: a => fmtDist(a.distance) },
-    { medal: '⛰️', title: 'Most elevation gain',      find: src.reduce((b, a) => (a.total_elevation_gain||0) > (b?.total_elevation_gain||0) ? a : b, null), fmt: a => fmtElev(a.total_elevation_gain) },
+    { medal: '⛰️', title: 'Most elevation gain',      find: src.filter(a => !['AlpineSki','BackcountrySki','NordicSki','Snowboard','IceSkate'].includes(a.type)).reduce((b, a) => (a.total_elevation_gain||0) > (b?.total_elevation_gain||0) ? a : b, null), fmt: a => fmtElev(a.total_elevation_gain) },
     { medal: '⏱️', title: 'Longest duration',         find: src.reduce((b, a) => (a.moving_time||0) > (b?.moving_time||0) ? a : b, null),    fmt: a => fmtTime(a.moving_time) },
     { medal: '⚡', title: 'Fastest average speed',    find: src.filter(a => a.distance > 1000).reduce((b, a) => (a.average_speed||0) > (b?.average_speed||0) ? a : b, null), fmt: a => `${(a.average_speed*3.6).toFixed(1)} km/h` },
     { medal: '���', title: 'Highest calorie burn',     find: src.reduce((b, a) => (a.kilojoules||0) > (b?.kilojoules||0) ? a : b, null),       fmt: a => `${Math.round(a.kilojoules * 0.239)} kcal` },
