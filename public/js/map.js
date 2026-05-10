@@ -101,48 +101,33 @@ function buildPopup(activity, color) {
 }
 
 // ── Elevation panel ───────────────────────────────────────────────────────────
-function openElevationPanel(activity, coords, color) {
-  document.getElementById('elevation-title').textContent = activity.name;
-  document.getElementById('elevation-panel').classList.remove('hidden');
-
-  // Fake elevation from coords (real elevation needs detailed API call — use latlng index as proxy)
-  // For now draw distance-based flat profile if no elevation data, or use elev_high/low hint
-  const points = coords.length;
-  const labels = coords.map((_, i) => fmtDist((activity.distance || 0) * i / Math.max(points - 1, 1)));
-
-  // Approximate elevation by interpolating between known values
-  const elevLow  = activity.elev_low  || 0;
-  const elevHigh = activity.elev_high || (activity.total_elevation_gain || 0);
-  const elevData = coords.map((_, i) => {
-    const t = i / Math.max(points - 1, 1);
-    return elevLow + (elevHigh - elevLow) * Math.sin(t * Math.PI);
-  });
-
-  const statsEl = document.getElementById('elevation-stats');
-  statsEl.innerHTML = [
-    activity.distance      ? `<span>Distance <strong>${fmtDist(activity.distance)}</strong></span>` : '',
-    activity.total_elevation_gain ? `<span>Gain <strong>${fmtElev(activity.total_elevation_gain)}</strong></span>` : '',
-    activity.moving_time   ? `<span>Time <strong>${fmtTime(activity.moving_time)}</strong></span>` : '',
-    activity.average_speed ? `<span>Avg <strong>${(activity.average_speed * 3.6).toFixed(1)} km/h</strong></span>` : '',
-  ].join('');
-
-  const ctx = document.getElementById('chart-elevation').getContext('2d');
-  if (elevationChart) elevationChart.destroy();
-
+function renderElevationChart(activity, distData, altData, color) {
   const isDark = document.documentElement.dataset.theme === 'dark';
   const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
   const textColor = isDark ? '#999' : '#666';
+
+  // Downsample to max 200 points so the chart stays fast
+  const maxPts = 200;
+  const step = Math.max(1, Math.floor(altData.length / maxPts));
+  const labels = [], data = [];
+  for (let i = 0; i < altData.length; i += step) {
+    labels.push(fmtDist(distData[i]));
+    data.push(Math.round(altData[i]));
+  }
+
+  const ctx = document.getElementById('chart-elevation').getContext('2d');
+  if (elevationChart) elevationChart.destroy();
 
   elevationChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [{
-        data: elevData,
+        data,
         borderColor: color,
         backgroundColor: color + '22',
         fill: true,
-        tension: 0.4,
+        tension: 0.3,
         pointRadius: 0,
         borderWidth: 2
       }]
@@ -150,14 +135,58 @@ function openElevationPanel(activity, coords, color) {
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => `${Math.round(ctx.parsed.y)} m` }
+        callbacks: { label: c => `${c.parsed.y} m` }
       }},
       scales: {
         x: { display: false },
-        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 4, callback: v => `${Math.round(v)}m` } }
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 4, callback: v => `${v}m` } }
       }
     }
   });
+}
+
+async function openElevationPanel(activity, coords, color) {
+  document.getElementById('elevation-title').textContent = activity.name;
+  document.getElementById('elevation-panel').classList.remove('hidden');
+
+  // Show stats immediately (available from summary)
+  document.getElementById('elevation-stats').innerHTML = [
+    activity.distance            ? `<span>Distance <strong>${fmtDist(activity.distance)}</strong></span>` : '',
+    activity.total_elevation_gain ? `<span>Gain <strong>${fmtElev(activity.total_elevation_gain)}</strong></span>` : '',
+    activity.moving_time         ? `<span>Time <strong>${fmtTime(activity.moving_time)}</strong></span>` : '',
+    activity.average_speed       ? `<span>Avg <strong>${(activity.average_speed * 3.6).toFixed(1)} km/h</strong></span>` : '',
+  ].join('');
+
+  // Show a loading placeholder in the chart canvas
+  const ctx = document.getElementById('chart-elevation').getContext('2d');
+  if (elevationChart) { elevationChart.destroy(); elevationChart = null; }
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.fillStyle = document.documentElement.dataset.theme === 'dark' ? '#999' : '#aaa';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Loading elevation…', ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+  try {
+    const res = await fetch(`/api/activity/${activity.id}/streams`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const streams = await res.json();
+
+    const altData  = streams.altitude?.data;
+    const distData = streams.distance?.data;
+
+    if (!altData || !distData || altData.length < 2) {
+      // No altitude data (e.g. indoor activity) — show message
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.fillText('No elevation data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
+    }
+
+    renderElevationChart(activity, distData, altData, color);
+  } catch (err) {
+    console.warn('Elevation stream fetch failed:', err.message);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillText('Could not load elevation data', ctx.canvas.width / 2, ctx.canvas.height / 2);
+  }
 }
 
 // ── Heatmap ───────────────────────────────────────────────────────────────────

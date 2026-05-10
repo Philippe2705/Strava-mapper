@@ -141,6 +141,35 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
+// Fetch altitude + distance streams for a single activity
+app.get('/api/activity/:id/streams', async (req, res) => {
+  if (!req.session.access_token) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const id = parseInt(req.params.id, 10);
+  if (!id) return res.status(400).json({ error: 'Invalid activity id' });
+
+  try {
+    const token = await ensureValidToken(req);
+    const response = await axios.get(
+      `https://www.strava.com/api/v3/activities/${id}/streams`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { keys: 'altitude,distance', key_by_type: true }
+      }
+    );
+    res.json(response.data);
+  } catch (err) {
+    if (err.response?.status === 429) {
+      const retryAfter = err.response.headers['x-ratelimit-reset'] || 60;
+      return res.status(429).json({ error: 'Rate limit exceeded', retryAfter });
+    }
+    console.error('Streams fetch failed:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Failed to fetch streams' });
+  }
+});
+
 // Fetch a single page of activities (paginated calls driven by the frontend)
 app.get('/api/activities', async (req, res) => {
   if (!req.session.access_token) {
