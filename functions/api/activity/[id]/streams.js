@@ -1,4 +1,4 @@
-import { getSession, makeSessionCookie } from '../../_shared/session.js';
+import { getSession, makeSessionCookie } from '../../../_shared/session.js';
 
 async function refreshIfNeeded(session, env) {
   const now = Math.floor(Date.now() / 1000);
