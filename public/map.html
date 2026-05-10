@@ -1,112 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Strava Mapper — My Activities</title>
-
-  <!-- Leaflet CSS (served locally) -->
   <link rel="stylesheet" href="/leaflet/leaflet.css" />
-
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="map-body">
 
-  <!-- Top navigation bar -->
-  <header class="map-navbar">
-    <div class="navbar-brand">
-      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="currentColor"/>
-        <circle cx="12" cy="9" r="2.5" fill="white"/>
-      </svg>
-      Strava Mapper
-    </div>
-
-    <div class="navbar-athlete" id="athlete-info">
-      <!-- Populated by JS -->
-    </div>
-
-    <div class="navbar-actions">
-      <button id="btn-fit-bounds" class="btn-secondary" title="Fit all routes in view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-        </svg>
-        Fit all
-      </button>
-      <a href="/logout" class="btn-secondary">Logout</a>
-    </div>
-  </header>
-
-  <!-- Loading overlay -->
+  <!-- ── Loading overlay ─────────────────────────────────────────────────── -->
   <div id="loading-overlay" class="loading-overlay">
     <div class="loading-box">
       <div class="spinner"></div>
-      <p id="loading-text">Fetching your activities…</p>
-      <div class="progress-bar-wrap">
-        <div id="progress-bar" class="progress-bar"></div>
-      </div>
+      <p id="loading-text">Connecting to Strava…</p>
+      <div class="progress-bar-wrap"><div id="progress-bar" class="progress-bar"></div></div>
       <p id="loading-count" class="loading-count">0 activities loaded</p>
     </div>
   </div>
 
-  <!-- Main layout: map + sidebar -->
-  <div class="map-layout">
+  <!-- ── App shell ────────────────────────────────────────────────────────── -->
+  <div class="app-shell hidden" id="app-shell">
 
-    <!-- Leaflet map -->
-    <div id="map"></div>
-
-    <!-- Legend (floating, inside map area) -->
-    <div id="legend" class="legend hidden">
-      <div class="legend-header">
-        <span>Activity types</span>
-        <button id="legend-toggle-all" class="legend-toggle-all">Hide all</button>
+    <!-- Top navbar -->
+    <header class="map-navbar">
+      <div class="navbar-brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="currentColor"/>
+          <circle cx="12" cy="9" r="2.5" fill="white"/>
+        </svg>
+        Strava Mapper
       </div>
-      <ul id="legend-list" class="legend-list">
-        <!-- Populated by JS -->
-      </ul>
-    </div>
 
-  </div>
+      <!-- Toolbar -->
+      <div class="navbar-toolbar">
 
-  <!-- Stats panel -->
-  <section id="stats-panel" class="stats-panel hidden">
+        <!-- Map view toggle -->
+        <div class="btn-group" role="group" aria-label="Map view">
+          <button id="btn-view-routes" class="btn-tool active" title="Show routes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M3 17l4-8 4 4 4-6 4 10"/></svg>
+            Routes
+          </button>
+          <button id="btn-view-heatmap" class="btn-tool" title="Heatmap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>
+            Heatmap
+          </button>
+        </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-count">—</div>
-        <div class="stat-label">Activities</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-distance">—</div>
-        <div class="stat-label">Total distance</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-elevation">—</div>
-        <div class="stat-label">Total elevation</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-time">—</div>
-        <div class="stat-label">Moving time</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-longest">—</div>
-        <div class="stat-label">Longest activity</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-highest">—</div>
-        <div class="stat-label">Most elevation gain</div>
-      </div>
-    </div>
+        <div class="toolbar-sep"></div>
 
-    <div class="type-breakdown" id="type-breakdown">
-      <!-- Populated by JS -->
-    </div>
+        <!-- Date range -->
+        <div class="date-range-group">
+          <button class="btn-tool date-preset active" data-preset="all">All time</button>
+          <button class="btn-tool date-preset" data-preset="year">This year</button>
+          <button class="btn-tool date-preset" data-preset="month">This month</button>
+          <button class="btn-tool date-preset" data-preset="week">This week</button>
+        </div>
 
-  </section>
+        <div class="toolbar-sep"></div>
 
-  <!-- Leaflet JS (served locally) -->
+        <!-- Search -->
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="search-input" class="search-input" type="text" placeholder="Search activities…" autocomplete="off" />
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <!-- Fit bounds -->
+        <button id="btn-fit-bounds" class="btn-tool" title="Fit all routes in view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        </button>
+
+        <!-- Dark mode toggle -->
+        <button id="btn-theme" class="btn-tool" title="Toggle dark/light mode">
+          <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+          <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" class="hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+
+      <div class="navbar-athlete" id="athlete-info"></div>
+      <a href="/logout" class="btn-tool" style="margin-left:4px;">Logout</a>
+    </header>
+
+    <!-- Body = sidebar + map -->
+    <div class="body-layout">
+
+      <!-- ── Left sidebar ─────────────────────────────────────────────────── -->
+      <aside class="sidebar">
+
+        <!-- Tab bar -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-tab="filters">Filters</button>
+          <button class="sidebar-tab" data-tab="stats">Stats</button>
+          <button class="sidebar-tab" data-tab="records">Records</button>
+          <button class="sidebar-tab" data-tab="charts">Charts</button>
+        </div>
+
+        <!-- ── Tab: Filters ──────────────────────────────────────────────── -->
+        <div class="tab-panel active" id="tab-filters">
+
+          <div class="sidebar-section-title">Activity types
+            <button id="legend-toggle-all" class="link-btn">Hide all</button>
+          </div>
+          <ul id="legend-list" class="legend-list"></ul>
+
+        </div>
+
+        <!-- ── Tab: Stats ────────────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-stats">
+
+          <div class="sidebar-section-title">Totals</div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="stat-count">—</div><div class="stat-label">Activities</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-distance">—</div><div class="stat-label">Distance</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-elevation">—</div><div class="stat-label">Elevation</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-time">—</div><div class="stat-label">Moving time</div></div>
+          </div>
+
+          <div class="sidebar-section-title" style="margin-top:16px;">By type</div>
+          <div id="type-breakdown" class="type-breakdown"></div>
+
+        </div>
+
+        <!-- ── Tab: Records ──────────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-records">
+          <div class="sidebar-section-title">Personal records</div>
+          <div id="records-list" class="records-list"></div>
+        </div>
+
+        <!-- ── Tab: Charts ───────────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-charts">
+
+          <div class="sidebar-section-title">Monthly distance
+            <select id="chart-year-select" class="inline-select"></select>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
+
+          <div class="sidebar-section-title" style="margin-top:20px;">Activity calendar</div>
+          <div id="calendar-wrap" class="calendar-wrap"></div>
+
+        </div>
+
+      </aside>
+
+      <!-- ── Map area ─────────────────────────────────────────────────────── -->
+      <div class="map-area">
+        <div id="map"></div>
+
+        <!-- Elevation profile popup (shown when a route is clicked) -->
+        <div id="elevation-panel" class="elevation-panel hidden">
+          <div class="elevation-header">
+            <span id="elevation-title" class="elevation-title"></span>
+            <button id="elevation-close" class="elevation-close">✕</button>
+          </div>
+          <div class="chart-wrap" style="height:110px;"><canvas id="chart-elevation"></canvas></div>
+          <div class="elevation-stats" id="elevation-stats"></div>
+        </div>
+      </div>
+
+    </div><!-- /body-layout -->
+  </div><!-- /app-shell -->
+
+  <!-- Scripts -->
   <script src="/leaflet/leaflet.js"></script>
-
+  <script src="/vendor/leaflet.heat.js"></script>
+  <script src="/vendor/chart.umd.js"></script>
   <script src="/js/map.js"></script>
 </body>
 </html>
