@@ -299,9 +299,9 @@ function buildRecords() {
   const records = [
     { medal: '���', title: 'Longest activity',        find: src.reduce((b, a) => (a.distance||0) > (b?.distance||0) ? a : b, null),         fmt: a => fmtDist(a.distance) },
     { medal: '⛰️', title: 'Most elevation gain',      find: src.filter(a => !['AlpineSki','BackcountrySki','NordicSki','Snowboard','IceSkate'].includes(a.type)).reduce((b, a) => (a.total_elevation_gain||0) > (b?.total_elevation_gain||0) ? a : b, null), fmt: a => fmtElev(a.total_elevation_gain) },
-    { medal: '⏱️', title: 'Longest duration',         find: src.reduce((b, a) => (a.moving_time||0) > (b?.moving_time||0) ? a : b, null),    fmt: a => fmtTime(a.moving_time) },
+    { medal: '⏱️', title: 'Longest duration',         find: src.reduce((b, a) => (a.elapsed_time||0) > (b?.elapsed_time||0) ? a : b, null),    fmt: a => fmtTime(a.elapsed_time) },
     { medal: '⚡', title: 'Fastest average speed',    find: src.filter(a => a.distance > 1000).reduce((b, a) => (a.average_speed||0) > (b?.average_speed||0) ? a : b, null), fmt: a => `${(a.average_speed*3.6).toFixed(1)} km/h` },
-    { medal: '���', title: 'Highest calorie burn',     find: src.reduce((b, a) => (a.kilojoules||0) > (b?.kilojoules||0) ? a : b, null),       fmt: a => `${Math.round(a.kilojoules * 0.239)} kcal` },
+    { medal: '❤️', title: 'Highest heart rate',       find: src.filter(a => a.max_heartrate > 0).reduce((b, a) => (a.max_heartrate||0) > (b?.max_heartrate||0) ? a : b, null), fmt: a => `${a.max_heartrate} bpm` },
   ];
 
   const list = document.getElementById('records-list');
