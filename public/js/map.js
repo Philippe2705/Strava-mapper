@@ -69,11 +69,11 @@ function addActivityPolyline(activity) {
   const type = activity.type || 'default';
   const color = colorFor(type);
 
-  const pl = L.polyline(coords, { color, weight: 2.5, opacity: 0.7 });
-  pl.on('mouseover', () => pl.setStyle({ weight: 4, opacity: 1 }));
+  const pl = L.polyline(coords, { color, weight: 4, opacity: 0.7 });
+  pl.on('mouseover', () => pl.setStyle({ weight: 6, opacity: 1 }));
   pl.on('mouseout', () => {
     const isHighlighted = pl.options._highlighted;
-    pl.setStyle({ weight: isHighlighted ? 4 : 2.5, opacity: isHighlighted ? 1 : 0.7 });
+    pl.setStyle({ weight: isHighlighted ? 6 : 4, opacity: isHighlighted ? 1 : 0.7 });
   });
   pl.on('click', () => openElevationPanel(activity, coords, color));
   pl.bindPopup(() => buildPopup(activity, color), { maxWidth: 260 });
